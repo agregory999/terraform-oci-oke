@@ -646,6 +646,19 @@ variable "service_account_cluster_role_binding" {
   type        = string
 }
 
+variable "vcn_id" {
+  description = "vcn id"
+  default     = ""
+  type        = string
+}
+
+variable "cluster_subnets" {
+  description = "subnet ids"
+  type = map(any)
+}
+
+variable "bastion_public_ip" { }
+variable "operator_private_ip" {}
 # tagging
 variable "tags" {
   default = {
