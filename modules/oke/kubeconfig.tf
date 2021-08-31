@@ -30,9 +30,9 @@ data "oci_containerengine_cluster_kube_config" "kube_config" {
 }
 
 resource "null_resource" "create_local_kubeconfig" {
-  provisioner "local-exec" {
-    command = "rm -rf generated"
-  }
+#  provisioner "local-exec" {
+#    command = "rm -rf generated"
+#  }
 
   provisioner "local-exec" {
     command = "mkdir -p generated"
