@@ -35,7 +35,7 @@ resource "null_resource" "create_local_kubeconfig" {
   }
 
   provisioner "local-exec" {
-    command = "mkdir generated"
+    command = "mkdir -p generated"
   }
 
   provisioner "local-exec" {
