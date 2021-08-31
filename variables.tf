@@ -679,3 +679,9 @@ variable "tags" {
   description = "Tags to apply to different resources."
   type        = map(any)
 }
+
+# Count of clusters to create
+variable "cluster_count" {
+  default = 1
+  type    = number
+}

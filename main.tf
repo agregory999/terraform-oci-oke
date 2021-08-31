@@ -3,6 +3,10 @@
 
 # cluster creation for oke
 module "oke" {
+  # Count 
+  count = var.cluster_count
+
+  # Module
   source = "./modules/oke"
 
   # provider
@@ -35,7 +39,7 @@ module "oke" {
   # oke cluster parameters
   cluster_kubernetes_version                              = var.kubernetes_version
   control_plane_access                                    = var.control_plane_access
-  cluster_name                                            = var.cluster_name
+  cluster_name                                            = "${var.cluster_name}-${count.index}"
   cluster_options_add_ons_is_kubernetes_dashboard_enabled = var.dashboard_enabled
   cluster_options_kubernetes_network_config_pods_cidr     = var.pods_cidr
   cluster_options_kubernetes_network_config_services_cidr = var.services_cidr
@@ -51,7 +55,7 @@ module "oke" {
 
   # oke node pool parameters
   node_pools            = var.node_pools
-  node_pool_name_prefix = var.node_pool_name_prefix
+  node_pool_name_prefix = "${var.node_pool_name_prefix}${count.index}"
   node_pool_image_id    = var.node_pool_image_id
   node_pool_os          = var.node_pool_os
   node_pool_os_version  = var.node_pool_os_version
