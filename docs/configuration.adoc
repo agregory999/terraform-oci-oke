@@ -1,9 +1,9 @@
 = Configuration
-
 :idprefix:
 :idseparator: -
 :sectlinks:
 :sectnums:
+:toc: auto
 
 :uri-repo: https://github.com/oracle-terraform-modules/terraform-oci-oke
 
@@ -43,27 +43,11 @@
 :uri-terraform-options: {uri-docs}/terraformoptions.adoc
 :uri-topology: {uri-docs}/topology.adoc
 
-. link:#assumptions[Assumptions]
-. link:#configure-the-variable-file[Configure the variable file]
-. link:#configure-identity-parameters[Configure identity parameters]
-. link:#configure-ssh-keys[Configure ssh keys]
-. link:#configure-oci-parameters[Configure OCI parameters]
-. link:#configure-oci-networking-parameters[Configure OCI Networking parameters]
-. link:#configure-bastion-host-parameters[Configure Bastion Host parameters]
-. link:#configure-operator-host-parameters[Configure Operator Host parameters]
-. link:#configure-oke-parameters[Configure OKE parameters]
-. link:#configure-oke-node-pool-parameters[Configure OKE Node Pool parameters]
-. link:#configure-oke-load-balancer-parameters[Configure OKE Load Balancer parameters]
-. link:#configure-ocir-parameters[Configure OCIR parameters]
-. link:#configure-calico-parameters[Configure Calico parameters]
-. link:#configure-kubernetes-metrics-server-parameters[Configure Kubernetes Metrics Server parameters]
-. link:#configure-kms-integration-parameters[Configure KMS Integration parameters]
+== Assumptions
 
-=== Assumptions
+This section assumes you have completed all the {uri-prereqs}[Prerequisites].
 
-This section assumes you have completed all the {uri-prereqs}[pre-requisites].
-
-=== Configure the variable file
+== Configure the variable file
 
 A sample variable file (terraform.tfvars.example) with all the configuration options is available. Create a terraform variable file by copying the terraform.tfvars.example:
 
@@ -71,7 +55,7 @@ A sample variable file (terraform.tfvars.example) with all the configuration opt
 cp terraform.tfvars.example terraform.tfvars
 ----
 
-=== Configure identity parameters
+== Configure identity parameters
 
 Enter the values for the following parameters in the terraform.tfvars file:
 
@@ -87,11 +71,17 @@ e.g.
 api_fingerprint = "1a:bc:23:45:6d:78:e9:f0:gh:ij:kl:m1:23:no:4p:5q"
 ----
 
-You would have obtained your values when doing the {uri-prereqs}[pre-requisites]. 
+Alternatively, you can also specify these using Terraform environment variables by prepending TF_variable_name e.g.
+
+----
+export TF_api_fingerprint = "1a:bc:23:45:6d:78:e9:f0:gh:ij:kl:m1:23:no:4p:5q"
+----
+
+You would have obtained your values when doing the {uri-prereqs}[Prerequisites]. 
 
 {uri-terraform-options}#identity-and-access[Reference]
 
-=== Configure ssh keys
+== Configure ssh keys
 
 If you intend to use the bastion host, you must supply the ssh keys:
 
@@ -101,27 +91,43 @@ ssh_private_key_path = "~/.ssh/id_rsa"
 ssh_public_key_path = "~/.ssh/id_rsa.pub"
 ----
 
+If your private ssh key has a different name or path than the default "~/.ssh/id_*" e.g "~/.ssh/dev_rsa", you will need to add the private key to your ssh agent:
+
+----
+eval $(ssh-agent -s)
+ssh-add ~/.ssh/dev_rsa
+----
+
 {uri-terraform-options}#ssh-keys[Reference]
 
-=== Configure OCI parameters
+== Configure OCI parameters
 
-The 2 OCI parameters here mainly concern:
+The 3 OCI parameters here mainly concern:
 
-* the label_prefix: this will append a string to the name of every resource created
-* the region: this allows you to select the region where you want the OKE cluster deployed
+* `compartment_id`: is the compartment where all the resources will be created in
+* `label_prefix`: this will prepend a string to the name of every resource created
+* `region`: this allows you to select the region where you want the OKE cluster deployed
+
 
 e.g.
 
 ----
-label_prefix="dev"
-region="us-phoenix-1"
+compartment_id = "compartment_id = "ocid1.compartment...."
+label_prefix   = "dev"
+home_region = "us-phoenix-1"
+region = "ap-sydney-1"
 ----
+
+Regions must have exactly 2 entries as above:
+
+* home_region: is the tenancy's home region. This may be different from the region where you want to create OKE.
+* region: is the actual region where you want to create the OKE cluster.
 
 The list of regions can be found {uri-oci-region}[here].
 
 {uri-terraform-options}#general-oci[Reference]
 
-=== Configure OCI Networking parameters
+== Configure OCI Networking parameters
 
 The networking parameters concern the VCN and the subnets network configuration as well as whether to enable some specific features such as the NAT Gateway. 
 
@@ -139,27 +145,41 @@ If you need to change the default VCN's CIDR, note the following:
 
 {uri-terraform-options}#oci-networking[Reference]
 
-=== Configure bastion host parameters
+== Configure bastion host parameters
 
-The bastion host parameters concern whether you want to enable the bastion. 
+The bastion host parameters concern:
 
-=== Configure operator host parameters
+. whether you want to enable the bastion
+. from where you can access the bastion
+. the different parameters about the bastion host e.g. shape, image id etc.
 
-The operator host parameters concern whether you want to enable the operator host. 1 parameter to keep in mind here is the operator_instance_principal. Be aware that if this is enabled, it gives API access to the operator host without authentication.
+Please note that the bastion host is different from the OCI Bastion service.
+
+== Configure operator host parameters
+
+The operator host parameters concern:
+
+. whether you want to enable the operator host
+. the list of NSG ids of the operator host
+. the different parameters about the operator host e.g. shape, image id etc.
+
+1 parameter to keep in mind here is the enable_operator_instance_principal. Be aware that if this is enabled, it gives API access to the operator host without authentication.
 
 Read {uri-instructions}#enabling-instance_principal-on-the-operator-host[more] about {uri-oci-instance-principal}[instance_principal].
 
-{uri-terraform-options}#bastion-host[Reference]
+{uri-terraform-options}#operator-host[Reference]
 
-=== Configure OKE parameters
+== Configure OKE parameters
 
 The OKE parameters concern mainly the following:
 
+* whether you want your OKE control plane to be public or private
 * whether you want to deploy public or private worker nodes
 * whether you want to allow NodePort or ssh access to the worker nodes
 * Kubernetes options such as dashboard, networking
 * number of node pools and their respective size of the cluster
 * services and pods cidr blocks
+* whether to use encryption
 
 ****
 If you need to change the default services and pods' CIDRs, note the following:
@@ -172,7 +192,7 @@ Refer to {uri-topology}[topology] for more thorough examples.
 
 {uri-terraform-options}#oke[Reference]
 
-=== Configure OKE Node Pool parameters
+== Configure OKE Node Pool parameters
 
 The OKE Node Pool parameters control the following:
 
@@ -180,6 +200,8 @@ The OKE Node Pool parameters control the following:
 . the size of each node pool
 . the shape of the worker node in each node pool
 . the boot volume size in GB
+. the number of OCPUs in each worker node
+. the memory for each worker node in GB
 . the node pool name prefix
 . whether to use a custom image id. Else, the major.minor version of Oracle Linux to use
 
@@ -187,11 +209,10 @@ An empty value for boot volume size will default the boot volume to 50GB. This v
 
 Refer to {uri-topology}[topology] for more thorough examples.
 
-=== Configure OKE Load Balancer parameters
+== Configure OKE Load Balancer parameters
 
 The OKE Load Balancer parameters concern mainly the following:
 
-. the preferred Availability Domain you want to place the load balancers
 . the type of load balancer (public/internal)
 . the list of destination ports to allow for public ingress
 
@@ -201,7 +222,7 @@ Refer to {uri-topology}[topology] for more thorough examples.
 
 {uri-terraform-options}#oke-load-balancers[Reference]
 
-=== Configure OCIR parameters
+== Configure OCIR parameters
 
 The {uri-oci-authtoken}#[Auth Token] must first be manually created and stored in {uri-oci-secret}#[OCI Secret in Vault]. It will subsequently be used to create a Kubernetes secret, which can then be used as an imagePullSecrets in a deployment. If you do not need to use private OCIR repositories, then leave the *secret_id* parameter empty. Refer to the {uri-instructions}#creating-a-secret-for-ocir[instructions] for how to create the Auth Token and the Secret in Vault.
 
@@ -213,32 +234,31 @@ kubectl --namespace=default get secret ocirsecret --export -o yaml | kubectl app
 
 {uri-terraform-options}#ocir[Reference]
 
-=== Configure Calico parameters
+== Configure Calico parameters
 
 The calico parameters control the installation of {uri-calico}[Calico] for {uri-calico-policy}[network policy].
 
 {uri-terraform-options}#calico[Reference]
 
-=== Configure Kubernetes Metrics Server parameters
+== Configure Kubernetes Metrics Server parameters
 
 The Kubernetes Metrics Server parameter controls the installation of {uri-metrics-server}[Kubernetes Metrics Server]. *Required* for {uri-kubernetes-hpa}[Horizontal Pod Autoscaling].
 
 {uri-terraform-options}#kubernetes-metrics-server[Reference]
 
-=== Configure KMS Integration parameters
+== Configure KMS Integration parameters
 
 The KMS integration parameters control whether {uri-oci-kms}[OCI Key Management Service] will be used for encrypting Kubernetes secrets. Additionally, the bastion and operator hosts must be enabled as well as instance_principal on the operator.
 
 ----
-bastion_enabled = true
-operator_enabled = true
-operator_instance_principal = true
+create_bastion_host = true
+create_operator = true
+enable_operator_instance_principal = true
 use_encryption = true
-existing_key_id = <existing_key_id>
+kms_key_id = <kms_key_id>
 ----
 
 OKE also supports enforcing the use of signed images. You can enforce the use of signed image using the following parameters:
-
 
 ----
 use_signed_images = false

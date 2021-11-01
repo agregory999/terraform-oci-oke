@@ -1,141 +1,80 @@
-# Copyright 2017, 2019 Oracle Corporation and/or affiliates.  All rights reserved.
+# Copyright 2017, 2019 Oracle Corporation and/or affiliates.
 # Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl
+
+# oci provider
+variable "tenancy_id" {}
 
 # general oci parameters
 variable "compartment_id" {}
 
 variable "label_prefix" {}
 
-# region parameters
-variable "ad_names" {
-  type = list(string)
-}
-variable "region" {}
-
 # ssh keys
 
-variable "oke_ssh_keys" {
-  type = object({
-    ssh_private_key_path = string
-    ssh_public_key_path  = string
-  })
-}
+variable "ssh_public_key" {}
 
-# bastion
-
-variable "oke_operator" {
-  type = object({
-    bastion_public_ip           = string
-    operator_private_ip         = string
-    bastion_enabled             = bool
-    operator_enabled            = bool
-    operator_instance_principal = bool
-    operator_version            = string
-    bastion_state               = string
-  })
-}
+variable "ssh_public_key_path" {}
 
 # oke
+variable "cluster_kubernetes_version" {}
 
-variable "oke_cluster" {
-  type = object({
-    cluster_kubernetes_version                              = string
-    cluster_access                                          = string
-    cluster_name                                            = string
-    cluster_options_add_ons_is_kubernetes_dashboard_enabled = bool
-    cluster_options_kubernetes_network_config_pods_cidr     = string
-    cluster_options_kubernetes_network_config_services_cidr = string
-    cluster_subnets                                         = map(string)
-    vcn_id                                                  = string
+variable "control_plane_type" {}
 
-    # encryption
-    use_encryption = bool
-    kms_key_id     = string
-
-    # signed images
-    use_signed_images  = bool
-    image_signing_keys = list(string)
-
-    # admission controller options
-    admission_controller_options = map(bool)
-  })
+variable "control_plane_nsgs" {
+  type = list(string)
 }
 
-variable "node_pools" {
-  type = object({
-    node_pools            = any
-    node_pool_name_prefix = string
-    node_pool_image_id    = string
-    node_pool_os          = string
-    node_pool_os_version  = string
-  })
-}
+variable "cluster_name" {}
 
-variable "lbs" {
-  type = object({
-    preferred_lb_subnets = string
-  })
-}
-
-# ocir
-variable "oke_ocir" {
-  type = object({
-    email_address = string
-    ocir_urls     = map(string)
-    secret_id     = string
-    secret_name   = string
-    username      = string
-    secret_ns     = string
-  })
-}
-
-# calico
-variable "calico" {
-  type = object({
-    calico_version = string
-    install_calico = bool
-  })
-}
-
-#metricserver
-
-variable "metricserver_enabled" {
-  default = false
-  type    = bool
-}
-
-variable "vpa" {
-  type = object({
-    enabled = bool
-    version = string
-  })
-}
-
-# service account
-
-variable "service_account" {
-  type = object({
-    create_service_account               = bool
-    service_account_name                 = string
-    service_account_namespace            = string
-    service_account_cluster_role_binding = string
-  })
-}
-
-#check worker node active
-variable "check_node_active" {
-  type = string
-}
-
-# upgrade
-variable "nodepool_drain" {
+variable "cluster_options_add_ons_is_kubernetes_dashboard_enabled" {
   type = bool
 }
 
-variable "nodepool_upgrade_method" {
-  type = string
+variable "cluster_options_kubernetes_network_config_pods_cidr" {}
+
+variable "cluster_options_kubernetes_network_config_services_cidr" {}
+
+variable "cluster_subnets" {
+  type = map(any)
 }
 
-variable "node_pools_to_drain" {
+variable "vcn_id" {}
+
+# encryption
+variable "use_encryption" {
+  type = bool
+}
+
+variable "kms_key_id" {}
+
+# signed images
+variable "use_signed_images" {
+  type = bool
+}
+
+variable "image_signing_keys" {
   type = list(string)
+}
+
+# admission controller options
+variable "admission_controller_options" {
+  type = map(any)
+}
+
+variable "node_pools" {
+  type = any
+}
+
+variable "node_pool_name_prefix" {}
+
+variable "node_pool_image_id" {}
+
+variable "node_pool_os" {}
+
+variable "node_pool_os_version" {}
+
+variable "preferred_load_balancer" {}
+
+variable "worker_nsgs" {
+  type = list(any)
 }

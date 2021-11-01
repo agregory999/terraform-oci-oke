@@ -7,13 +7,66 @@ All notable changes to this project are documented in this file.
 
 The format is based on {uri-changelog}[Keep a Changelog].
 
-=== Unreleased
-* Changed default Kubernetes version to v1.20.8 and removed v1.16.8, v1.17.9 from docs.
-* Added support for reserved public IP address for NAT gateway
-* Bug fix: Use correct calico file to install calico for networking policy only (#307)
-* Added support for GPU and ARM shapes (#302)
+== 4.0.0
+=== Breaking changes
+* Set minimum version to Terraform 1.0.0
+* Removed base module and use vcn, bastion and operator modules directly
+* Renamed and standardized all control variables
+* Removed deprecated template provider dependencies
+* Made bastion and operator modules conditional
+* Removed identity parameters in between modules to improve reusability
+* Renamed okenetwork submodule to network
+* Created a new submodule (extensions) and moved all scripts and extra things there
+* Moved dynamic group and policy for kms into oke module
+* Added a 30s delay between policy creation for kms and cluster creation to allow for global propagation
+* Added a home provider in oke module for dynamic group and policy creation
+* Changed from security list to NSGs for better flexibility and security (#398)
 
-= 3.2.0 (May 12, 2021)
+=== Changes
+* Changed default Kubernetes version to v1.20.11 and removed v1.16.8, v1.17.9 from docs.
+* Added support for GPU and ARM shapes (#302)
+* VCN module upgraded to VCN 3.0.0. This allows supporting multiple cidr blocks (#360)
+* Bastion and operator sub-modules upgraded to 3.0.0 (#183)
+* kubeconfig on operator always uses PRIVATE_ENDPOINT (#358)
+* Documented providers in quickstart (#355)
+* Renamed tags to freeform_tags in line with other modules (#364)
+* Added validation on some variables (#370)
+
+=== New Features
+* Added OCI Bastion Service as option to access operator or control plane 
+* Added support for reserved public IP address for NAT gateway (#311)
+* Added LPGs for hub and spoke deployment model (#295)
+* Allow access to operator via OCI Bastion service (#352)
+* Added support for using NSGs for cluster endpoint (#343)
+* Added option to disable worker node access to Internet. Users can only pull images from OCIR (#331)
+* Added ability to specify api and private ssh keys using heredoc format with a variable (#375)
+
+=== Bug fixes
+* Added home region to update dynamic group script for cases when actual region is different from tenancy home region (#347)
+* Added 1 missing rule for operator to access control plane (#349)
+* Added security list for OCI Bastion service to access the control plane (#408)
+* Updated topology diagrams to show correct traffic flow (#412)
+* Changed bastion type to STANDARD to avoid destruction (#409)
+
+=== Known issues
+* Enabling WAF has to be done in 2 stages:
+** Create the cluster along with the VCN and other resources without WAF enabled by setting `enable_waf=false`
+** Subsequently enable WAF by setting `enable_waf=true`
+
+== 3.3.0
+
+=== Additions
+* Support for using reserved public IP address for NAT Gateway (#311) with new parameter nat_gateway_public_ip_id
+* Support for GPU and ARM Shapes (#302 )
+* Conditional checks for WAF CIDR block data source
+
+=== Changes
+* Default Kubernetes version changed to v1.20.8
+
+=== Bug fixes
+* Use correct manifest to install Calico as policy (#306)
+
+== 3.2.0 (May 12, 2021)
 
 === Additions
 * Added faster kubectl script (Thanks @joelezell-conga, @rgmccaw, Richard Exley)
@@ -43,7 +96,7 @@ The format is based on {uri-changelog}[Keep a Changelog].
 === Deletions
 Removed hardcoded WAF CIDRs and used data source instead.
 
-= 3.1.0 (April 6, 2021)
+== 3.1.0 (April 6, 2021)
 
 === Additions 
 
@@ -66,7 +119,7 @@ Removed hardcoded WAF CIDRs and used data source instead.
 * Removed deprecated helm repos
 * Removed tenancy_name
 
-= 3.0.0 (January 14, 2021)
+== 3.0.0 (January 14, 2021)
 
 === Additions
 
@@ -88,7 +141,7 @@ Removed hardcoded WAF CIDRs and used data source instead.
 * Updated default Kubernetes module to 1.18.10
 * Updated and simplified Calico installation (#253)
 
-= 2.3.3 (October 30, 2020)
+== 2.3.3 (October 30, 2020)
 * Upgraded base module to 1.3.3 to temporarily disable OSMS as fix for #225
 
 == 2.3.2 (August 19, 2020)

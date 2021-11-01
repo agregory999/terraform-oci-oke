@@ -1,31 +1,25 @@
-# Copyright 2017, 2021 Oracle Corporation and/or affiliates.  All rights reserved.
+# Copyright 2017, 2021 Oracle Corporation and/or affiliates.
 # Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl
 
 locals {
-  # used by cluster
-  lb_subnet = var.lbs.preferred_lb_subnets == "public" ? "pub_lb" : "int_lb"
 
-  node_pools_size_list = [
-    for node_pool in data.oci_containerengine_node_pools.all_node_pools.node_pools :
-    node_pool.node_config_details[0].size
+  # used by cluster
+  lb_subnet = var.preferred_load_balancer == "public" ? "pub_lb" : "int_lb"
+
+  ad_names = [
+    for ad_name in data.oci_identity_availability_domains.ad_list.availability_domains :
+    ad_name.name
   ]
 
-  # workaround for summing a list of numbers: https://github.com/hashicorp/terraform/issues/17239
-  total_nodes = length(flatten([
-    for nodes in local.node_pools_size_list : range(nodes)
-  ]))
+  # dynamic group all oke clusters in a compartment
+  dynamic_group_rule_all_clusters = "ALL {resource.type = 'cluster', resource.compartment.id = '${var.compartment_id}'}"
 
-  service_account_cluster_role_binding_name = var.service_account.service_account_cluster_role_binding == "" ? "${var.service_account.service_account_name}-crb" : var.service_account.service_account_cluster_role_binding
+  # policy to allow dynamic group of all clusters to use kms 
+  policy_statement = (var.use_encryption == true) ? "Allow dynamic-group ${oci_identity_dynamic_group.oke_kms_cluster[0].name} to use keys in compartment id ${var.compartment_id} where target.key.id = '${var.kms_key_id}'" : ""
 
   # 1. get a list of available images for this cluster
   # 2. filter by version
   # 3. if more than 1 image found for this version, pick the latest
-  #node_pool_image_id = element([for source in data.oci_containerengine_node_pool_option.node_pool_options.sources : source.image_id if length(regexall("$-${var.node_pools.node_pool_os_version}", source.source_name)) > 0], 0)
   node_pool_image_ids = data.oci_containerengine_node_pool_option.node_pool_options.sources
-  # determine if post provisioning operations are possible
-  # requires:
-  ## 1. bastion to be enabled and in a running state
-  ## 2. operation to be enabled and instance_principal to be enabled
 
-  post_provisioning_ops = var.oke_operator.bastion_enabled == true && var.oke_operator.bastion_state == "RUNNING" && var.oke_operator.operator_enabled == true && var.oke_operator.operator_instance_principal == true ? true : false
 }
