@@ -164,8 +164,8 @@ locals {
   workers_egress = [
     {
       description      = "Allow egress for all traffic to allow pods to communicate between each other on different worker nodes on the worker subnet",
-      destination      = local.workers_subnet,
-      destination_type = "CIDR_BLOCK",
+      destination      = local.workers-nsg,
+      destination_type = "NSG_NAME",
       protocol         = local.all_protocols,
       port             = -1,
       stateless        = false
@@ -209,15 +209,15 @@ locals {
       description = "Allow ingress for all traffic to allow pods to communicate between each other on different worker nodes on the worker subnet",
       protocol    = local.all_protocols,
       port        = -1,
-      source      = local.workers_subnet,
-      source_type = "CIDR_BLOCK",
+      source      = local.workers-nsg,
+      source_type = "NSG_NAME",
       stateless   = false
     },
     {
       description = "Allow control plane to communicate with worker nodes",
       protocol    = local.tcp_protocol,
       port        = -1,
-      source      = local.contol-plane-nsg,
+      source      = local.control-plane-nsg,
       source_type = "NSG_NAME",
       stateless   = false
     },
