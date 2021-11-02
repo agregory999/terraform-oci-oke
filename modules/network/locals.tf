@@ -20,13 +20,6 @@ locals {
 
   workers_subnet = cidrsubnet(local.vcn_cidr, lookup(var.subnets["workers"], "newbits"), lookup(var.subnets["workers"], "netnum"))
 
-  # NSG Names
-  pub-lb-nsg   = var.label_prefix == "none" ? "pub-lb" : "${var.label_prefix}-pub-lb"
-  control-plane-nsg   = var.label_prefix == "none" ? "pub-lb" : "${var.label_prefix}-control-plane"
-  workers-nsg   = var.label_prefix == "none" ? "pub-lb" : "${var.label_prefix}-workers"
-  int-lb-nsg   = var.label_prefix == "none" ? "pub-lb" : "${var.label_prefix}-int-lb"
-  operator-nsg   = var.label_prefix == "none" ? "pub-lb" : "${var.label_prefix}-operator"
-  
   anywhere = "0.0.0.0/0"
 
   # port numbers
@@ -85,8 +78,8 @@ locals {
   cp_egress = [
     {
       description      = "Allow Kubernetes Control plane to communicate to the control plane subnet. Required for when using OCI Bastion service.",
-      destination      = local.control-plane-nsg,
-      destination_type = "NSG_NAME",
+      destination      = local.cp_subnet,
+      destination_type = "CIDR_BLOCK",
       protocol         = local.tcp_protocol,
       port             = 6443,
       stateless        = false
@@ -101,8 +94,8 @@ locals {
     },
     {
       description      = "Allow all TCP traffic from control plane to worker nodes",
-      destination      = local.workers-nsg,
-      destination_type = "NSG_NAME",
+      destination      = local.workers_subnet,
+      destination_type = "CIDR_BLOCK",
       protocol         = local.tcp_protocol,
       port             = -1,
       stateless        = false
@@ -151,21 +144,21 @@ locals {
       stateless   = false
     },
     {
-        description = "Allow access from variable control_plane_allowed_cidrs"
-        protocol    = local.tcp_protocol,
-        port        = 6443,
-        source      = var.control_plane_allowed_cidrs[0]
-        source_type = "CIDR_BLOCK",
-        stateless   = false
-      }
+      description = "Allow access from variable control_plane_allowed_cidrs"
+      protocol    = local.tcp_protocol,
+      port        = 6443,
+      source      = var.control_plane_allowed_cidrs[0]
+      source_type = "CIDR_BLOCK",
+      stateless   = false
+    }
   ]
 
   # workers
   workers_egress = [
     {
       description      = "Allow egress for all traffic to allow pods to communicate between each other on different worker nodes on the worker subnet",
-      destination      = local.workers-nsg,
-      destination_type = "NSG_NAME",
+      destination      = local.workers_subnet,
+      destination_type = "CIDR_BLOCK",
       protocol         = local.all_protocols,
       port             = -1,
       stateless        = false
@@ -209,16 +202,16 @@ locals {
       description = "Allow ingress for all traffic to allow pods to communicate between each other on different worker nodes on the worker subnet",
       protocol    = local.all_protocols,
       port        = -1,
-      source      = local.workers-nsg,
-      source_type = "NSG_NAME",
+      source      = local.workers_subnet,
+      source_type = "CIDR_BLOCK",
       stateless   = false
     },
     {
       description = "Allow control plane to communicate with worker nodes",
       protocol    = local.tcp_protocol,
       port        = -1,
-      source      = local.control-plane-nsg,
-      source_type = "NSG_NAME",
+      source      = local.cp_subnet,
+      source_type = "CIDR_BLOCK",
       stateless   = false
     },
     {
