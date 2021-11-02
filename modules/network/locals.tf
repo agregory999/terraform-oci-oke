@@ -20,6 +20,13 @@ locals {
 
   workers_subnet = cidrsubnet(local.vcn_cidr, lookup(var.subnets["workers"], "newbits"), lookup(var.subnets["workers"], "netnum"))
 
+  # NSG Names
+  pub-lb-nsg   = var.label_prefix == "none" ? "pub-lb" : "${var.label_prefix}-pub-lb"
+  control-plane-nsg   = var.label_prefix == "none" ? "pub-lb" : "${var.label_prefix}-control-plane"
+  workers-nsg   = var.label_prefix == "none" ? "pub-lb" : "${var.label_prefix}-workers"
+  int-lb-nsg   = var.label_prefix == "none" ? "pub-lb" : "${var.label_prefix}-int-lb"
+  operator-nsg   = var.label_prefix == "none" ? "pub-lb" : "${var.label_prefix}-operator"
+  
   anywhere = "0.0.0.0/0"
 
   # port numbers
@@ -56,8 +63,8 @@ locals {
   cp_egress_seclist = [
     {
       description      = "Allow Bastion service to communicate to the control plane endpoint. Required for when using OCI Bastion service.",
-      destination      = local.cp_subnet,
-      destination_type = "CIDR_BLOCK",
+      destination      = local.control-plane-nsg,
+      destination_type = "NSG_NAME",
       protocol         = local.tcp_protocol,
       port             = 6443,
       stateless        = false
@@ -67,8 +74,8 @@ locals {
   cp_ingress_seclist = [
     {
       description = "Allow Bastion service to communicate to the control plane endpoint. Required for when using OCI Bastion service.",
-      source      = local.cp_subnet,
-      source_type = "CIDR_BLOCK",
+      source      = local.control-plane-nsg,
+      source_type = "NSG_NAME",
       protocol    = local.tcp_protocol,
       port        = 6443,
       stateless   = false
