@@ -63,8 +63,8 @@ locals {
   cp_egress_seclist = [
     {
       description      = "Allow Bastion service to communicate to the control plane endpoint. Required for when using OCI Bastion service.",
-      destination      = local.control-plane-nsg,
-      destination_type = "NSG_NAME",
+      destination      = local.cp_subnet,
+      destination_type = "CIDR_BLOCK",
       protocol         = local.tcp_protocol,
       port             = 6443,
       stateless        = false
@@ -74,8 +74,8 @@ locals {
   cp_ingress_seclist = [
     {
       description = "Allow Bastion service to communicate to the control plane endpoint. Required for when using OCI Bastion service.",
-      source      = local.control-plane-nsg,
-      source_type = "NSG_NAME",
+      source      = local.cp_subnet,
+      source_type = "CIDR_BLOCK",
       protocol    = local.tcp_protocol,
       port        = 6443,
       stateless   = false
@@ -85,8 +85,8 @@ locals {
   cp_egress = [
     {
       description      = "Allow Kubernetes Control plane to communicate to the control plane subnet. Required for when using OCI Bastion service.",
-      destination      = local.cp_subnet,
-      destination_type = "CIDR_BLOCK",
+      destination      = local.control-plane-nsg,
+      destination_type = "NSG_NAME",
       protocol         = local.tcp_protocol,
       port             = 6443,
       stateless        = false
@@ -101,8 +101,8 @@ locals {
     },
     {
       description      = "Allow all TCP traffic from control plane to worker nodes",
-      destination      = local.workers_subnet,
-      destination_type = "CIDR_BLOCK",
+      destination      = local.workers-nsg,
+      destination_type = "NSG_NAME",
       protocol         = local.tcp_protocol,
       port             = -1,
       stateless        = false
@@ -217,8 +217,8 @@ locals {
       description = "Allow control plane to communicate with worker nodes",
       protocol    = local.tcp_protocol,
       port        = -1,
-      source      = local.cp_subnet,
-      source_type = "CIDR_BLOCK",
+      source      = local.contol-plane-nsg,
+      source_type = "NSG_NAME",
       stateless   = false
     },
     {
