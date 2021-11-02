@@ -143,6 +143,14 @@ locals {
       source_type = "CIDR_BLOCK",
       stateless   = false
     },
+    {
+        description = "Allow access from variable control_plane_allowed_cidrs"
+        protocol    = local.tcp_protocol,
+        port        = 6443,
+        source      = var.control_plane_allowed_cidrs[0]
+        source_type = "CIDR_BLOCK",
+        stateless   = false
+      }
   ]
 
   # workers

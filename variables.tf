@@ -794,3 +794,9 @@ variable "debug_mode" {
   description = "Whether to turn on debug mode."
   type        = bool
 }
+
+# Count of clusters to create
+variable "cluster_count" {
+  default = 1
+  type    = number
+}

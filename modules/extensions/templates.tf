@@ -34,6 +34,7 @@ locals {
     {
       cluster-id = var.cluster_id
       region     = var.region
+      compartment_id = var.compartment_id
     }
   )
 

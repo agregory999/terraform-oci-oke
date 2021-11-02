@@ -198,6 +198,9 @@ module "network" {
 module "oke" {
   source = "./modules/oke"
 
+  # Added to support multiple clusters
+  count = var.cluster_count
+
   # provider
   tenancy_id = var.tenancy_id
 
@@ -213,7 +216,7 @@ module "oke" {
   cluster_kubernetes_version                              = var.kubernetes_version
   control_plane_type                                      = var.control_plane_type
   control_plane_nsgs                                      = concat(var.control_plane_nsgs, [module.network.control_plane_nsg_id])
-  cluster_name                                            = var.cluster_name
+  cluster_name                                            = "${var.cluster_name}-${count.index}"
   cluster_options_add_ons_is_kubernetes_dashboard_enabled = var.dashboard_enabled
   cluster_options_kubernetes_network_config_pods_cidr     = var.pods_cidr
   cluster_options_kubernetes_network_config_services_cidr = var.services_cidr
@@ -227,7 +230,7 @@ module "oke" {
 
   # oke node pool parameters
   node_pools            = var.node_pools
-  node_pool_name_prefix = var.node_pool_name_prefix
+  node_pool_name_prefix = "${var.node_pool_name_prefix}-${count.index}"
   node_pool_image_id    = var.node_pool_image_id
   node_pool_os          = var.node_pool_os
   node_pool_os_version  = var.node_pool_os_version
@@ -281,12 +284,12 @@ module "extensions" {
   operator_os_version                = var.operator_os_version
 
   # oke cluster parameters
-  cluster_id           = module.oke.cluster_id
+  cluster_id           = module.oke[0].cluster_id
   pods_cidr            = var.pods_cidr
   use_encryption       = var.use_encryption
   kms_key_id           = var.kms_key_id
-  kms_dynamic_group_id = module.oke.kms_dynamic_group_id
-
+  kms_dynamic_group_id = module.oke[0].kms_dynamic_group_id
+  
   # ocir parameters
   email_address    = var.email_address
   ocir_urls        = var.ocir_urls
