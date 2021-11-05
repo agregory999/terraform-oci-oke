@@ -3,7 +3,7 @@
 
 resource "null_resource" "check_worker_active" {
   triggers = {
-    node_pools = length(data.oci_containerengine_node_pools.all_node_pools.node_pools)
+#    node_pools = length(data.oci_containerengine_node_pools.all_node_pools.node_pools)
   }
 
   connection {
