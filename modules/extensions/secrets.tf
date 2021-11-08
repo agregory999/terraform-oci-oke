@@ -3,7 +3,7 @@
 
 resource "null_resource" "secret" {
   triggers = {
-#    always_run = "${timestamp()}"
+    always_run = "${timestamp()}"
   }
   connection {
     host        = var.operator_private_ip

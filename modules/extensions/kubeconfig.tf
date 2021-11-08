@@ -28,7 +28,7 @@ resource "local_file" "kube_config_file" {
 
 resource "null_resource" "write_kubeconfig_on_operator" {
   triggers = {
-#    always_run = "${timestamp()}"
+    always_run = "${timestamp()}"
   }
   connection {
     host        = var.operator_private_ip

@@ -3,7 +3,7 @@
 
 resource "null_resource" "install_kubectl_operator" {
   triggers = {
-#    always_run = "${timestamp()}"
+    always_run = "${timestamp()}"
   }
   connection {
     host        = var.operator_private_ip
