@@ -35,6 +35,9 @@ resource "null_resource" "install_kubectl_operator" {
 
 # helm
 resource "null_resource" "install_helm_operator" {
+  triggers = {
+    always_run = "${timestamp()}"
+  }
   connection {
     host        = var.operator_private_ip
     private_key = local.ssh_private_key
