@@ -39,7 +39,7 @@ resource "null_resource" "write_kubeconfig_on_operator" {
     bastion_private_key = local.ssh_private_key
   }
 
-  depends_on = [null_resource.install_kubectl_operator]
+  depends_on = [null_resource.install_kubectl_on_operator]
 
   provisioner "file" {
     content     = local.generate_kubeconfig_template
@@ -60,8 +60,9 @@ resource "null_resource" "write_kubeconfig_on_operator" {
     inline = [
       "chmod +x $HOME/generate_kubeconfig.sh",
       "$HOME/generate_kubeconfig.sh",
+      "mkdir $HOME/bin",
       "chmod +x $HOME/token_helper.sh",
-      "sudo mv $HOME/token_helper.sh /usr/local/bin",
+      "mv $HOME/token_helper.sh $HOME/bin",
       "chmod +x $HOME/kubeconfig_set_credentials.sh",
       "$HOME/kubeconfig_set_credentials.sh",
       "rm -f $HOME/generate_kubeconfig.sh",
