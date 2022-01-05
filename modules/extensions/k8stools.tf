@@ -23,7 +23,7 @@ resource "null_resource" "install_kubectl_on_operator" {
     inline = [
       "chmod +x $HOME/install_kubectl.sh",
       "$HOME/install_kubectl.sh",
-      "rm -f $HOME/install_kubectl.sh"
+      #"rm -f $HOME/install_kubectl.sh"
     ]
   }
 
