@@ -21,7 +21,7 @@ resource "null_resource" "secret" {
 
   provisioner "file" {
     content     = local.secret_template
-    destination = "~/secret.sh"
+    destination = "secret.sh"
   }
 
   provisioner "remote-exec" {
