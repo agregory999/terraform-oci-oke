@@ -18,7 +18,7 @@ resource "null_resource" "create_service_account" {
 
   provisioner "file" {
     content = local.create_service_account_template
-    destination = "~/create_service_account.sh"
+    destination = "create_service_account.sh"
   }
 
   provisioner "remote-exec" {

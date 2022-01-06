@@ -16,12 +16,12 @@ resource "null_resource" "drain_nodes" {
 
   provisioner "file" {
     content     = local.drain_list_template
-    destination = "~/drainlist.py"
+    destination = "drainlist.py"
   }
 
   provisioner "file" {
     content     = local.drain_template
-    destination = "~/drain.sh"
+    destination = "drain.sh"
   }
 
   provisioner "remote-exec" {
