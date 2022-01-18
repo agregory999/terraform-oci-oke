@@ -21,7 +21,7 @@ resource "null_resource" "drain_nodes" {
 
   provisioner "file" {
     content     = local.drain_template
-    destination = "drain.sh"
+    destination = "/home/opc/drain.sh"
   }
 
   provisioner "remote-exec" {
