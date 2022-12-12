@@ -6,7 +6,7 @@ module "vcn" {
   version = "3.5.3"
 
   # general oci parameters
-  compartment_id = local.compartment_id
+  compartment_id = local.net_compartment_id
   label_prefix   = var.label_prefix
 
   # gateways
@@ -39,7 +39,7 @@ module "drg" {
   version = "1.0.3"
 
   # general oci parameters
-  compartment_id = local.compartment_id
+  compartment_id = local.net_compartment_id
   label_prefix   = var.label_prefix
 
   # drg parameters
@@ -62,7 +62,7 @@ module "bastion" {
   version = "3.1.5"
 
   tenancy_id     = local.tenancy_id
-  compartment_id = local.compartment_id
+  compartment_id = local.app_compartment_id
 
   label_prefix = var.label_prefix
 
@@ -114,7 +114,7 @@ module "operator" {
 
   # general oci parameters
   tenancy_id     = local.tenancy_id
-  compartment_id = local.compartment_id
+  compartment_id = local.app_compartment_id
   label_prefix   = var.label_prefix
 
   # networking
@@ -163,7 +163,7 @@ module "bastionsvc" {
   source = "./modules/bastionsvc"
 
   # general oci parameters
-  compartment_id = local.compartment_id
+  compartment_id = local.net_compartment_id
   label_prefix   = var.label_prefix
 
   # bastion service parameters
@@ -185,7 +185,7 @@ module "network" {
   source = "./modules/network"
 
   # general oci parameters
-  compartment_id = local.compartment_id
+  compartment_id = local.net_compartment_id
   label_prefix   = var.label_prefix
 
   # oke networking parameters
@@ -238,7 +238,7 @@ module "oke" {
   tenancy_id = local.tenancy_id
 
   # general oci parameters
-  compartment_id = local.compartment_id
+  compartment_id = local.app_compartment_id
   label_prefix   = var.label_prefix
 
   # ssh keys
@@ -304,7 +304,7 @@ module "storage" {
 
   # general oci parameters
   tenancy_id          = local.tenancy_id
-  compartment_id      = local.compartment_id
+  compartment_id      = local.net_compartment_id
   availability_domain = var.availability_domains["fss"]
   label_prefix        = var.label_prefix
 
@@ -336,7 +336,7 @@ module "extensions" {
   tenancy_id = local.tenancy_id
 
   # general oci parameters
-  compartment_id = local.compartment_id
+  compartment_id = local.app_compartment_id
   label_prefix   = var.label_prefix
 
   # region parameters

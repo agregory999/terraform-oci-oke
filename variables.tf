@@ -69,14 +69,20 @@ variable "current_user_ocid" {
 }
 
 # General OCI parameters
+# ARG - ability to put vcn and bastion/operator in separate compartment - CIS Landing Zone
 
 # Overrides Resource Manager
-variable "compartment_id" {
-  description = "The compartment id where to create all resources."
+variable "net_compartment_id" {
+  description = "The compartment id where to create all NET resources."
   type        = string
   default     = ""
 }
 
+variable "app_compartment_id" {
+  description = "The compartment id where to create all APP resources."
+  type        = string
+  default     = ""
+}
 # Automatically populated by Resource Manager
 variable "compartment_ocid" {
   description = "A compartment OCID automatically populated by Resource Manager."
