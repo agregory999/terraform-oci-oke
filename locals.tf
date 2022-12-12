@@ -3,8 +3,12 @@
 
 locals {
   tenancy_id     = coalesce(var.tenancy_id, var.tenancy_ocid)
-  compartment_id = coalesce(
-    var.compartment_id, var.compartment_ocid,
+  net_compartment_id = coalesce(
+    var.net_compartment_id, var.compartment_ocid,
+    var.tenancy_id, var.tenancy_ocid,
+  )
+  app_compartment_id = coalesce(
+    var.app_compartment_id, var.compartment_ocid,
     var.tenancy_id, var.tenancy_ocid,
   )
   user_id = var.user_id != "" ? var.user_id : var.current_user_ocid
